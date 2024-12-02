@@ -9,6 +9,7 @@ class FourierFunction(object):
 		self.func = f
 		self.wl = wl
 		self.k_0 = 2 * np.pi / wl
+		print(self.k_0)
 
 		self.A_term = A_term
 		self.B_term = B_term
