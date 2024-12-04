@@ -6,14 +6,15 @@ import numpy as np
 import scipy as sp
 from scipy import stats
 from time import time
-from playsound import playsound
+#from playsound import playsound
 
 # rcParams
-#mpl.rcParams['animation.ffmpeg_path'] = r'C:\\Program Files\\ffmpeg-7.1-full_build\\bin\\ffmpeg.exe'
-mpl.rcParams['animation.ffmpeg_path'] = r'E:\Program Files\ffmpeg-7.1-full_build\bin\ffmpeg.exe'
+mpl.rcParams['animation.ffmpeg_path'] = r'C:\\Program Files\\ffmpeg-7.1-full_build\\bin\\ffmpeg.exe'
+#mpl.rcParams['animation.ffmpeg_path'] = r'E:\Program Files\ffmpeg-7.1-full_build\bin\ffmpeg.exe'
 rc_update = {'font.size': 7, 'font.family': 'serif',
 			 'font.serif': ['Times New Roman', 'FreeSerif'], 'mathtext.fontset': 'cm'}
 plt.rcParams.update(rc_update)
+
 og_colors = {'blue': '#18CCF5', 'red': '#FA3719'}
 colors = {'orange': '#ffab40', 'Lgrey': '#999', 'blue': '#7ea8a7',
 		  'red': '#e58e8fff', 'yellow': '#fcf3cc', 'dark_orange': '#bf6f22'}
@@ -91,7 +92,7 @@ class FourierFunction(object):
 
 		# x-space
 		axs['x-space'].clear()
-		x = np.linspace(x_plt_range[0], x_plt_range[1], 500)
+		x = np.linspace(x_plt_range[0], x_plt_range[1], 1000)
 		padding = 3
 		y_plt_range = (-max(abs(self.func(x))) - padding, max(abs(self.func(x))) + padding)
 		axs['x-space'].set(xlim=x_plt_range, ylim=y_plt_range)
@@ -161,16 +162,13 @@ class FourierFunction(object):
 			plt.show()
 
 
-	def animate(self, filename, x_plt_range, expansion_range, 
-				k_space=False, fps=10, slowdown=20, total_frames=None):
-		if not total_frames:
-			total_frames = int(np.ceil(slowdown * 20 * np.pi / self.w(1)))
+	def animate(self, filename, x_plt_range, expansion_range, total_frames,
+				k_space=False, fps=10, slowdown=20):
 		subplot_mosaic = [['x-space', 'x-space']]
 		if k_space:
 			subplot_mosaic.append(['k-space', 'wk-relation'])
 		fig, axs = plt.subplot_mosaic(subplot_mosaic, dpi=300)
 
-		fps = 10
 		def updater(frame):
 			t = frame / (slowdown * fps)
 			self.graph(fig, axs, x_plt_range, expansion_range,
@@ -204,8 +202,7 @@ def main():
 	# Pulse parameters
 	p_i = 800
 	m_i = 400
-	std = 0.01
-	w0 = 30
+	std = 0.0025
 	A = 20
 
 
@@ -246,7 +243,7 @@ def main():
 	# subplot_mosaic = [['x-space']]
 	fig, axs = plt.subplot_mosaic(subplot_mosaic, dpi=300)
 	x_plt_range = (-10 * std, 30 * std)
-	rang = 300
+	rang = 1000
 	expansion_range = (-rang + p_i, rang + p_i)
 
 	# FourierFunction
@@ -254,13 +251,14 @@ def main():
 	#gaussian_pulse.graph(fig, axs, x_plt_range, expansion_range=expansion_range,
 	#					 plot_original=True, show=True, k_space=True)
 	
-	filename = '../mp4/gaussian_pulse_low_dispersion2.mp4'
+	# Need to add way so that old files can't be overwriten.
+	filename = '../mp4/gaussian_pulse_high_dispersion3.mp4'
 	gaussian_pulse.animate(filename, x_plt_range, expansion_range,
-						   fps=10, slowdown=50, total_frames=3,
-						   k_space=True)
+						   fps=10, slowdown=100, total_frames=100,
+						   k_space=True)	
 
 	done_sound = '../GW150914_H1_shifted.wav'
-	playsound(done_sound)
+	#playsound(done_sound)
 
 
 if __name__ == '__main__':

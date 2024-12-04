@@ -35,5 +35,6 @@ fig, ax = plt.subplots()
 # ax.plot(k, A_term(k))
 ax.plot(x, y[0])
 #ax.plot(ts, y[1])
+print(type(ax))
 
 plt.show()
