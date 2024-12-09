@@ -10,8 +10,8 @@ from time import time
 from playsound import playsound
 
 # rcParams
-mpl.rcParams['animation.ffmpeg_path'] = r'C:\\Program Files\\ffmpeg-7.1-full_build\\bin\\ffmpeg.exe'
-# mpl.rcParams['animation.ffmpeg_path'] = r'E:\Program Files\ffmpeg-7.1-full_build\bin\ffmpeg.exe'
+# mpl.rcParams['animation.ffmpeg_path'] = r'C:\\Program Files\\ffmpeg-7.1-full_build\\bin\\ffmpeg.exe'
+mpl.rcParams['animation.ffmpeg_path'] = r'E:\Program Files\ffmpeg-7.1-full_build\bin\ffmpeg.exe'
 
 rc_update = {'font.size': 10, 'font.family': 'serif',
 			 'font.serif': ['Times New Roman', 'FreeSerif'], 'mathtext.fontset': 'cm'}
@@ -354,7 +354,7 @@ def main():
 	# Pulse parameters
 	p_i = 25
 	m_i = 15
-	std = 0.1
+	std = 0.2
 	A = 20
 
 
@@ -392,7 +392,7 @@ def main():
 	
 	# Space variables
 	rang = 25
-	x = np.linspace(-10 * std, 50 * std, 1000)
+	x = np.linspace(-10 * std, 50 * std, 1300)
 	k = np.linspace(-rang + p_i, rang + p_i, 500)
 
 	# FourierFunction
@@ -401,7 +401,7 @@ def main():
 	#					 show=True, k_space=True, wk_relation=True)
 	
 	# Need a way to not overwrite old files
-	filename = '../mp4/gaussian_pulse_high_dispersion7.mp4'
+	filename = '../mp4/gaussian_pulses/gaussian_pulse_low_dispersion_4.mp4'
 	gaussian_pulse.animate(filename, x, k, fps=10, slowdown=10, total_frames=1000,
 						   k_space=False, wk_relation=False)
  
