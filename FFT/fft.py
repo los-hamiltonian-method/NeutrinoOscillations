@@ -1,6 +1,7 @@
 #%% Imports
 import numpy as np
 from time import time
+from typing import Callable
 
 
 #%% MiniPies
@@ -12,51 +13,10 @@ github.com/emilio-moreno/MiniPys
 '''
 
 minipy_formatter_path = r'C:\Users\Laevateinn\Documents\GitHub' \
-                         r'\MiniPys\Formatter'
-       
-                  
-#%% Time complexity  tester
-def tictac(lower_bound, upper_bound, step=1,
-           total_tests=4, show=True):
-    '''Complexity test.'''
-    
-    print("\nTime Complexity Test")
-    print("--------------------")
-    print(f"Making {total_tests} time complexity tests witn n's for each test "
-          f"in range({lower_bound}, {upper_bound}, {step}).")
-    
-    if show:
-        print("Progress shown. Use show=False to hide it.")
-    
-    TIC = time()
-    for k in range(total_tests):
-        n, times = [], []
-        if show:
-            TAC = time() - TIC
-            print(f"\nTest time: {round(TAC, 2)}s", f"k = {k}", f"n | t",
-                  "------------", sep="\n")
-        for i in range(lower_bound, upper_bound, step):
-            coeff = np.random.uniform(-100, 100, (i, 1))
-            P = Polynomial(coeff)
-            
-            tic = time()
-            P.FFT()
-            tac = time() - tic
-            
-            n.append(i)
-            times.append(tac)
-            
-            if show:
-                print(f"{i} | {tac:.2f}s")
-        n, times = np.array(n), np.array(times)
-        if k == 0:
-            times_avg = times
-        times_avg += times / total_tests
-    
-    TAC = time() - TIC
-    if show:
-        print(f"\nFinished test! ({TAC:.2f}s)")
-    return n, times_avg
+                        r'\MiniPys\Formatter'
+
+minipy_tictac_path = r'C:\Users\Laevateinn\Documents\GitHub' \
+                     r'\MiniPys\tictac'
 
 
 #%% FFT implementation for Polynomial
@@ -171,7 +131,10 @@ def main():
     import minipy_formatter as MF
 
     # Colors
-    MF.Format.rcUpdate()
+    # CMU = r'C:\Users\Laevateinn\AppData\Local\Microsoft\Windows\Fonts' \
+    #      r'\cmunrm.ttf'
+    # MF.Format([CMU]).rcUpdate()
+    MF.Format().rcUpdate()
     colors = MF.Colors(('miku', '#5dd4d8'), ('rin', '#ecd38c'),
                     ('darkrin', '#c6b176'), ('lgray', '#c0c0c0'))
     
@@ -200,12 +163,27 @@ def main():
     # Complexity tests    
     from scipy.optimize import curve_fit
     import matplotlib.pyplot as plt
+    sys.path.insert(0, minipy_tictac_path)
+    import tictac as tt
+    
+    # Code to be tested
+    def precode(i):
+        coeff = np.random.uniform(-100, 100, (i, 1))
+        global P
+        P = Polynomial(coeff)
+
+    def code(i):
+        global P
+        P.FFT()
     
     # Test params    
     upper_bound = int(2**14 + 3)
+    #upper_bound = int(2**12 + 3)
     lower_bound = 2
     step = 100
-    n, times_avg = tictac(lower_bound, upper_bound, step, total_tests=3)
+    n, times_avg = tt.tictac(lower_bound, upper_bound, step,
+                             precode=precode, code=code, total_tests=3)
+    tt.tictac()
     
     # Trying a linear fit
     f = lambda n, a: a * n
