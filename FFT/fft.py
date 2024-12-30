@@ -153,10 +153,10 @@ def main():
     validation = np.array(validation)
     
     fig, ax = plt.subplots()
-    ax.scatter(result, validation, color=colors.miku)
+    ax.scatter(result, validation, color=colors.miku.hex)
     ax.set(title="Validation", xlabel="FFT evaluation",
            ylabel="Numpy evaluation", aspect='equal')
-    ax.grid(linestyle='--', color=colors.lgray)
+    ax.grid(linestyle='--', color=colors.lgray.hex)
     plt.show()
 
 
@@ -193,13 +193,13 @@ def main():
     fig, ax = plt.subplots()
     ax.plot(N, f(N, opt[0]),
             label=f"$\mathcal{{O}}(n)$  Variance $= {cov[0, 0]:.3E}$",
-            color=colors.darkrin)
-    ax.scatter(n, times_avg, color=colors.rin)
+            color=colors.darkrin.hex)
+    ax.scatter(n, times_avg, color=colors.rin.hex)
     
     ax.set(title="Time complexity tests for polynomial-aimed FFT",
            xlabel="Polynomial degree ($d$)", ylabel="Time taken (s)")
     ax.legend(fontsize=10)
-    ax.grid(linestyle='--', color=colors.lgray)
+    ax.grid(linestyle='--', color=colors.lgray.hex)
     plt.show()
 
 
