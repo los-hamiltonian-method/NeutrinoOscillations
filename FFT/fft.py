@@ -203,6 +203,6 @@ def main():
     plt.show()
 
 
-#%% main() call
+#%% 呪い
 if __name__ == '__main__':
     main()
