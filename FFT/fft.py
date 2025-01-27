@@ -20,19 +20,23 @@ minipy_tictac_path = r'C:\Users\Laevateinn\Documents\GitHub' \
 
 
 #%% FFT implementation for Polynomial
+# TODO: I don't understand why I have repeated versions of staticmethod
+# functions for Polynomial.
 class Polynomial(object):
     
     @staticmethod
     def vectorize(x: float, degree: int):
-        '''Builds ndarray [[1], [x], ..., [x^degree]].'''
+        '''Builds ndarray [[1], [x], ..., [x^degree]]. O(degree + 1).'''
         X = []
-        for k in range(degree + 1):
-            X.append([x**k])
+        y = 1
+        for _ in range(degree + 1):
+            X.append([y])
+            y *= x
         return np.array(X)
-
+    
     @staticmethod
     def evaluate(x: float, coefficients: np.ndarray):
-        '''Evaluates polynomial at x.'''
+        '''Evaluates polynomial at x. O(len(coefficients)).'''
         degree = len(coefficients[:, 0]) - 1
         eva = np.transpose(Polynomial.vectorize(x, degree)) @ coefficients
         return eva[0, 0]
@@ -44,12 +48,13 @@ class Polynomial(object):
     
     @staticmethod
     def extract(coefficients: np.array):
-        '''Extracts even and odd coefficients.'''
+        '''Extracts even and odd coefficients. O(len(coefficients).'''
         degree = int(len(coefficients[:, 0]) - 1)
         filter_array = [bool((k + 1) % 2) for k in range(degree + 1)]
         
         evens = coefficients[:, 0][filter_array]
         odds = coefficients[:, 0][np.invert(filter_array)]
+        # Turning into column vectors.
         evens = np.reshape(evens, (len(evens), 1))
         odds = np.reshape(odds, (len(odds), 1))
         
@@ -84,10 +89,10 @@ class Polynomial(object):
         if n == 1:
             return coefficients
         
-        evens, odds = Polynomial.extract(coefficients)
+        evens, odds = Polynomial.extract(coefficients) # < O(n)
         # We won't provide a base when starting the algorithm, to allow for
         # padding.
-        if not base:
+        if not base: # O(n / 2)
             # There may be a better way to calculate n.
             n = int(2**np.ceil(np.log2(n)))
             base = np.exp(1j * 2 * np.pi / n)
@@ -96,14 +101,17 @@ class Polynomial(object):
             evens = np.append(evens, even_padding, axis=0)
             odds = np.append(odds, odd_padding, axis=0)
             
-        result = np.zeros((n, 1), dtype='complex_')
+        result = np.zeros((n, 1), dtype='complex_') # O(n)
     
+        # < O(n)
         y_e = Polynomial.fft(evens, base**2)
         y_o = Polynomial.fft(odds, base**2)
         
-        for k in range(int(n / 2)):
-            result[k, :] = y_e[k, :] + base**k * y_o[k, :]
-            result[int(k + n / 2)] = y_e[k, :] - base**k * y_o[k, :]
+        coeff = 1
+        for k in range(int(n / 2)): # O(n / 2)
+            result[k, :] = y_e[k, :] + coeff * y_o[k, :]
+            result[int(k + n / 2)] = y_e[k, :] - coeff * y_o[k, :]
+            coeff *= base
         return result
 
     def __repr__(self):
@@ -176,30 +184,28 @@ def main():
         global P
         P.FFT()
     
-    # Test params    
-    upper_bound = int(2**14 + 3)
-    #upper_bound = int(2**12 + 3)
-    lower_bound = 2
+    # Test params
+    name = "Time complexity tests for polynomial-aimed FFT"
+    variable = "Polynomial degree ($d$)"
+    #up_bound = int(2**14 + 3)
+    up_bound = int(2**12 + 3)
+    low_bound = 2
     step = 100
-    n, times_avg = tt.tictac(lower_bound, upper_bound, step,
-                             precode=precode, code=code, total_tests=3)
-    tt.tictac()
+    test = tt.TicTac(name, low_bound, up_bound, step, variable,
+              precode=precode, code=code, total_tests=1)
     
-    # Trying a linear fit
-    f = lambda n, a: a * n
-    opt, cov = curve_fit(f, n, times_avg)
+    # TODO: I believe the algorithm is nlog(n), but not sure.
+    # nlog(n) gives lower variance than n (E-13 vs E-11).
+    # Trying a O(nlog(n)) fit
+    f = lambda n, a: a * (n * np.log2(n))
+    opt, cov = curve_fit(f, test.n, test.t)
     
-    N = np.array([lower_bound, upper_bound])
-    fig, ax = plt.subplots()
+    N = np.array([low_bound, up_bound])
+    fig, ax = test.plot()
     ax.plot(N, f(N, opt[0]),
-            label=f"$\mathcal{{O}}(n)$  Variance $= {cov[0, 0]:.3E}$",
-            color=colors.darkrin.hex)
-    ax.scatter(n, times_avg, color=colors.rin.hex)
-    
-    ax.set(title="Time complexity tests for polynomial-aimed FFT",
-           xlabel="Polynomial degree ($d$)", ylabel="Time taken (s)")
-    ax.legend(fontsize=10)
-    ax.grid(linestyle='--', color=colors.lgray.hex)
+            label=f"$\mathcal{{O}}(n \log(n))$  Variance $= {cov[0, 0]:.3E}$",
+            color=colors.miku.hex)
+    ax.legend()
     plt.show()
 
 
